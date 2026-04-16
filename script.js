@@ -247,3 +247,66 @@ document.querySelectorAll('.chip').forEach(c =>
 );
 
 run();
+
+// ---------- Hero mini-demo ----------
+const heroInput    = document.getElementById('hero-input');
+const heroBtn      = document.getElementById('hero-go');
+const heroStatus   = document.getElementById('hero-status');
+const heroDt       = document.getElementById('hero-datetime');
+const heroDetail   = document.getElementById('hero-detail');
+const heroCard     = document.querySelector('.hero-tryit');
+
+function renderHero(status, dataObj) {
+  const ok = status < 400;
+  heroCard.classList.toggle('is-error', !ok);
+
+  heroStatus.textContent = `${status} ${ok ? 'OK' : 'ERR'}`;
+  heroStatus.className = 'status-badge ' + (ok ? 'ok' : 'err');
+
+  if (ok) {
+    heroDt.textContent = dataObj.datetime || '—';
+    const treated = dataObj.treated_as?.label || 'parsed';
+    const assumptions = (dataObj.assumption || [])
+      .map(a => a.label).filter(Boolean).join(', ');
+    heroDetail.textContent =
+      `treated_as: ${treated}` +
+      (assumptions ? ` · assumptions: ${assumptions}` : '');
+  } else {
+    heroDt.textContent = dataObj.error?.label || 'error';
+    heroDetail.textContent = dataObj.error?.message || 'Could not parse input.';
+  }
+}
+
+async function runHero() {
+  const value = heroInput.value.trim();
+  if (!value) {
+    heroDt.textContent = '—';
+    heroDetail.textContent = 'Type a date or click a chip to see the canonical ISO output.';
+    heroStatus.textContent = '';
+    return;
+  }
+  heroBtn.disabled = true;
+  heroBtn.textContent = '…';
+  heroDetail.textContent = 'Calling live API…';
+
+  try {
+    const resp = await callLambda(value);
+    renderHero(resp.status, resp.data);
+  } catch (err) {
+    const result = parsePhrase(value);
+    const { _error, ...rest } = result;
+    renderHero(_error ? 422 : 200, rest);
+  }
+
+  heroBtn.disabled = false;
+  heroBtn.textContent = 'Parse →';
+}
+
+if (heroBtn) {
+  heroBtn.addEventListener('click', runHero);
+  heroInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') runHero(); });
+  document.querySelectorAll('.hero-chip').forEach(c =>
+    c.addEventListener('click', () => { heroInput.value = c.dataset.value; runHero(); })
+  );
+  runHero(); // first render
+}

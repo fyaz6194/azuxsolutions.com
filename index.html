@@ -104,10 +104,10 @@
 <a class="announce-bar" href="#demo">
   <span class="announce-pulse"></span>
   <span class="announce-text">
-    <strong>Bored of fiddling with date pickers?</strong>
-    Just type it how you'd say it — try the live demo
+    <strong>Stop fighting date pickers.</strong>
+    Type a date the way you'd say it — live demo right here
   </span>
-  <span class="announce-cta">Try it now →</span>
+  <span class="announce-cta">Try it ↓</span>
 </a>
 
 <header class="site-header">
@@ -159,30 +159,35 @@
       </div>
 
       <div class="hero-visual">
-        <div class="code-card">
-          <div class="code-card-head">
-            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-            <span class="code-card-title">POST /parse  —  datetime_bot</span>
+        <div class="hero-tryit">
+          <div class="hero-tryit-head">
+            <span class="hero-tryit-badge">
+              <span class="hero-tryit-pulse"></span>
+              LIVE &mdash; type and see
+            </span>
+            <span class="hero-tryit-title">Try it here</span>
           </div>
-          <div class="code-card-body">
-            <div class="col col-input">
-              <p class="col-label">Input <span class="col-tag">human</span></p>
-              <pre class="lang-input"><code><span class="line">"16 Apr 2026 10:00 PM"</span>
-<span class="line">"25/Apr/26 6:00 AM"</span>
-<span class="line">"30 min from now"</span>
-<span class="line">"tomorrow at noon"</span></code></pre>
+
+          <label class="hero-tryit-label" for="hero-input">Type any date or time in plain English</label>
+          <div class="hero-tryit-row">
+            <input id="hero-input" type="text" value="tomorrow at 9 PM" spellcheck="false" autocomplete="off" />
+            <button id="hero-go" class="btn btn-primary hero-tryit-btn">Parse →</button>
+          </div>
+
+          <div class="hero-tryit-chips">
+            <button class="hero-chip" data-value="30 min from now">30 min from now</button>
+            <button class="hero-chip" data-value="tomorrow at noon">tomorrow at noon</button>
+            <button class="hero-chip" data-value="25/04/26 6:00 AM">25/04/26 6:00 AM</button>
+            <button class="hero-chip" data-value="16 Apr 2026 10 PM">16 Apr 2026 10 PM</button>
+          </div>
+
+          <div class="hero-tryit-result">
+            <div class="hero-tryit-result-head">
+              <span class="col-label">Canonical output</span>
+              <span id="hero-status" class="status-badge"></span>
             </div>
-            <div class="arrow" aria-hidden="true">→</div>
-            <div class="col col-output">
-              <p class="col-label">Output <span class="col-tag ok">200 OK</span></p>
-<pre class="lang-json"><code>{
-  <span class="k">"datetime"</span>: <span class="s">"2026-04-16T16:30:00.000Z"</span>,
-  <span class="k">"treated_as"</span>: {
-    <span class="k">"code"</span>:  <span class="n">2</span>,
-    <span class="k">"label"</span>: <span class="s">"within_window"</span>
-  }
-}</code></pre>
-            </div>
+            <div id="hero-datetime" class="hero-tryit-datetime">—</div>
+            <div id="hero-detail" class="hero-tryit-detail">Press Parse, click a chip, or just keep typing.</div>
           </div>
         </div>
       </div>
