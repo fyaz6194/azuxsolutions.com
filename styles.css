@@ -441,6 +441,50 @@ p { margin: 0 0 1em; }
 }
 @media (max-width: 720px) { .thanks-grid { grid-template-columns: 1fr; } }
 
+/* ---------- About ---------- */
+.about-block { max-width: 1040px; margin: 0 auto; }
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+.about-story h3, .about-mission h3 {
+  font-size: 1.05rem; color: #0f172a; margin-bottom: .8rem;
+  border-left: 3px solid #4f46e5; padding-left: .7rem;
+}
+.about-story p {
+  color: #334155; font-size: .98rem; line-height: 1.75;
+}
+.about-mission {
+  background: linear-gradient(135deg, #eef2ff, #faf5ff);
+  border: 1px solid #e0e7ff; border-radius: 14px;
+  padding: 1.4rem 1.6rem;
+}
+.about-mission ul {
+  list-style: none; padding: 0; margin: 0 0 1rem;
+}
+.about-mission li {
+  color: #334155; font-size: .92rem;
+  padding: .55rem 0 .55rem 1.7rem;
+  position: relative; line-height: 1.55;
+  border-top: 1px solid rgba(79,70,229,.12);
+}
+.about-mission li:first-child { border-top: none; }
+.about-mission li::before {
+  content: '→'; position: absolute; left: 0; top: .55rem;
+  color: #4f46e5; font-weight: 700;
+}
+.about-mission strong { color: #3730a3; }
+.about-meta {
+  font-size: .82rem; color: #475569;
+  background: white; border: 1px dashed #c7d2fe;
+  padding: .7rem .9rem; border-radius: 8px;
+  margin: 0;
+}
+.about-meta strong { color: #0f172a; }
+@media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; } }
+
 /* ---------- Contact ---------- */
 .contact-block { max-width: 960px; margin: 0 auto; }
 .contact-grid {
@@ -570,6 +614,17 @@ p { margin: 0 0 1em; }
 .footer-links { display: flex; gap: 1.2rem; flex-wrap: wrap; }
 .footer-links a { color: #cbd5e1; font-size: .9rem; }
 .footer-links a:hover { color: white; }
+.footer-social {
+  display: flex; gap: .8rem; align-items: center;
+  justify-content: flex-end;
+}
+.footer-social a {
+  font-size: .85rem; color: #cbd5e1;
+  padding: .35rem .85rem; border: 1px solid #334155;
+  border-radius: 999px;
+}
+.footer-social a:hover { color: white; border-color: #64748b; text-decoration: none; }
+@media (max-width: 960px) { .footer-social { justify-content: flex-start; } }
 .muted { color: #94a3b8; font-size: .9rem; margin: .4rem 0 0; }
 .muted.small { font-size: .8rem; text-align: right; }
 
