@@ -740,6 +740,11 @@ p { margin: 0 0 1em; }
   display: flex; gap: .7rem; align-items: flex-start;
 }
 .journey-step strong { color: #0f172a; font-size: .92rem; display: block; margin-bottom: .2rem; }
+.journey-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500; font-size: .78rem; color: #16a34a;
+  margin-left: .2rem;
+}
 .journey-step p { color: #475569; font-size: .84rem; margin: 0; }
 .journey-dot {
   flex: 0 0 auto; width: 14px; height: 14px;
