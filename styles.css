@@ -456,6 +456,20 @@ p { margin: 0 0 1em; }
 .about-story p {
   color: #334155; font-size: .98rem; line-height: 1.75;
 }
+.track-record {
+  list-style: none; padding: 0; margin: 1rem 0 0;
+}
+.track-record li {
+  position: relative; padding: .7rem 0 .7rem 1.8rem;
+  color: #334155; font-size: .93rem; line-height: 1.6;
+  border-top: 1px solid #f1f5f9;
+}
+.track-record li:first-child { border-top: none; }
+.track-record li::before {
+  content: '●'; position: absolute; left: .2rem; top: .85rem;
+  color: #4f46e5; font-size: .7rem;
+}
+.track-record strong { color: #0f172a; }
 .about-mission {
   background: linear-gradient(135deg, #eef2ff, #faf5ff);
   border: 1px solid #e0e7ff; border-radius: 14px;
