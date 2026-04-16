@@ -1,5 +1,15 @@
-// ---------- Footer year ----------
-document.getElementById('year').textContent = new Date().getFullYear();
+// ---------- Footer year & today stamps ----------
+const NOW = new Date();
+document.getElementById('year').textContent = NOW.getFullYear();
+
+const journeyToday = document.getElementById('journey-today');
+if (journeyToday) {
+  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = NOW.getDate();
+  const m = MONTHS_SHORT[NOW.getMonth()];
+  const y = NOW.getFullYear();
+  journeyToday.textContent = `(as of ${d} ${m} ${y})`;
+}
 
 // ---------- Mobile nav ----------
 const toggle = document.querySelector('.nav-toggle');
