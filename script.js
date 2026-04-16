@@ -4,11 +4,12 @@ document.getElementById('year').textContent = NOW.getFullYear();
 
 const journeyToday = document.getElementById('journey-today');
 if (journeyToday) {
-  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const d = NOW.getDate();
-  const m = MONTHS_SHORT[NOW.getMonth()];
-  const y = NOW.getFullYear();
-  journeyToday.textContent = `(as of ${d} ${m} ${y})`;
+  const BASELINE = new Date('2026-04-16T00:00:00Z');
+  const MS_PER_DAY = 86400000;
+  const startOfToday = Date.UTC(NOW.getUTCFullYear(), NOW.getUTCMonth(), NOW.getUTCDate());
+  const days = Math.max(1, Math.floor((startOfToday - BASELINE.getTime()) / MS_PER_DAY) + 1);
+  const plural = days === 1 ? 'day' : 'days';
+  journeyToday.textContent = `(Day ${days} · source-visible since 16 Apr 2026)`;
 }
 
 // ---------- Mobile nav ----------
