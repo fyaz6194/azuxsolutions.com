@@ -1,0 +1,6 @@
+memory/
+.claude/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
