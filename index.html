@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AZUX Solutions — Chatbot-DateTime &amp; future-proof accounting tooling by Fyaz Manknojiya</title>
 <meta name="description" content="AZUX Solutions (founded 2017, India &amp; Canada) builds future-proof, open-technology tooling for business accounting — including Chatbot-DateTime, GSTIN verification APIs, SGI Guidewire automation, and GUI POS software. Founded by Fyaz Manknojiya." />
-<meta name="keywords" content="AZUX Solutions, azuxsolutions, azuxsolutions.com, Fyaz Manknojiya, Fyaz, fyaz6194, AZUX Solutions YouTube, AZUX YouTube channel, Chatbot-DateTime, natural language datetime parser, ISO 8601 UTC strict parser, Python datetime API, FastAPI datetime API India, dateparser replacement, JSON schema datetime validator, Asia/Kolkata timezone default, GSTIN verification API, GST portal India, SGI Guidewire automation, Saskatchewan Government Insurance automation, GUI POS software India, multi-branch POS system, accounting software India Canada, future-proof accounting technology, open-source accounting tooling, computation driven accounting, computer engineering student developer, AWS Lambda ap-south-1, indie developer India Canada" />
+<meta name="keywords" content="AZUX Solutions, azuxsolutions, azuxsolutions.com, Fyaz Manknojiya, Fyaz, fyaz6194, AZUX Solutions YouTube, AZUX YouTube channel, Chatbot-DateTime, natural language datetime parser, ISO 8601 UTC strict parser, Python datetime API, FastAPI datetime API India, dateparser replacement, JSON schema datetime validator, Asia/Kolkata timezone default, GSTIN verification API, GST portal India, SGI Guidewire automation, Saskatchewan Government Insurance automation, GUI POS software India, multi-branch POS system, accounting software India Canada, future-proof accounting technology, open-source accounting tooling, computation driven accounting, computer engineering student developer, serverless cloud deployment, indie developer India Canada" />
 <meta name="author" content="Fyaz Manknojiya (AZUX Solutions)" />
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
 <meta name="googlebot" content="index, follow" />
@@ -68,7 +68,7 @@
     "SGI Guidewire automation",
     "Natural language datetime parsing",
     "ISO 8601 UTC",
-    "FastAPI", "Python", "AWS Lambda",
+    "FastAPI", "Python", "Serverless cloud computing",
     "Cloud services", "CI/CD", "PowerShell scripting"
   ]
 }
@@ -81,7 +81,7 @@
   "@type": "SoftwareApplication",
   "name": "Chatbot-DateTime",
   "applicationCategory": "DeveloperApplication",
-  "operatingSystem": "Any OS with Python 3.9+ / AWS Lambda arm64",
+  "operatingSystem": "Any OS with Python 3.9+ (also runs as a lightweight serverless function)",
   "softwareVersion": "1.0.0",
   "author": { "@type": "Organization", "name": "AZUX Solutions" },
   "creator": { "@type": "Person", "name": "Fyaz Manknojiya" },
@@ -355,7 +355,7 @@
   <section id="demo" class="section">
     <div class="container">
       <h2 class="section-title">Try it</h2>
-      <p class="section-sub">Calls the <strong>live AWS Lambda API</strong> in <code>ap-south-1</code> (Mumbai). Falls back to a local parser if the API is unreachable.</p>
+      <p class="section-sub">Calls the <strong>live hosted API</strong>. Falls back to an in-browser parser if the API is unreachable.</p>
 
       <div class="demo-card">
         <div class="demo-input">
@@ -652,9 +652,9 @@ curl -X POST http://127.0.0.1:8000/parse \
             </li>
             <li>
               <strong>Cloud services &amp; scripting</strong> — hands-on work with
-              AWS (Lambda, Function URLs, CloudWatch), OS-level resource scripting
-              (PowerShell, bash), and CI/CD for lightweight deployments like the one
-              powering this site.
+              major cloud providers (serverless functions, object storage, monitoring),
+              OS-level resource scripting (PowerShell, bash), and CI/CD for lightweight
+              deployments like the one powering this site.
             </li>
             <li>
               <strong>Chatbot-DateTime (public)</strong> — the first AZUX project
