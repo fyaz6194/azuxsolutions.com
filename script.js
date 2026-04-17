@@ -274,6 +274,10 @@ function renderHero(status, dataObj) {
   heroStatus.textContent = `${status} ${ok ? 'OK' : 'ERR'}`;
   heroStatus.className = 'status-badge ' + (ok ? 'ok' : 'err');
 
+  const ms = typeof dataObj.processing_time_ms === 'number'
+    ? ` · ${dataObj.processing_time_ms.toFixed(1)} ms`
+    : '';
+
   if (ok) {
     heroDt.textContent = dataObj.datetime || '—';
     const treated = dataObj.treated_as?.label || 'parsed';
@@ -281,10 +285,11 @@ function renderHero(status, dataObj) {
       .map(a => a.label).filter(Boolean).join(', ');
     heroDetail.textContent =
       `treated_as: ${treated}` +
-      (assumptions ? ` · assumptions: ${assumptions}` : '');
+      (assumptions ? ` · assumptions: ${assumptions}` : '') +
+      ms;
   } else {
     heroDt.textContent = dataObj.error?.label || 'error';
-    heroDetail.textContent = dataObj.error?.message || 'Could not parse input.';
+    heroDetail.textContent = (dataObj.error?.message || 'Could not parse input.') + ms;
   }
 }
 
