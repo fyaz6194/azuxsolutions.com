@@ -25,7 +25,14 @@ if (toggle) {
 // ---------- Live Lambda API ----------
 const API_URL = 'https://sevw27tphlhneffoe32sx7mbe40thfql.lambda-url.ap-south-1.on.aws/parse';
 
-async function callLambda(text) {
+// Serial queue: at most one Lambda request in flight; additional callers
+// wait their turn. Queue depth capped at 5 — beyond that we reject so the
+// caller falls back to the local parser instead of piling up requests.
+const MAX_QUEUE = 5;
+let queueDepth = 0;
+let lambdaChain = Promise.resolve();
+
+async function fetchLambda(text) {
   const resp = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -33,6 +40,20 @@ async function callLambda(text) {
   });
   const data = await resp.json();
   return { status: resp.status, data };
+}
+
+async function callLambda(text) {
+  if (queueDepth >= MAX_QUEUE) {
+    throw new Error('queue_full');
+  }
+  queueDepth++;
+  const run = lambdaChain.then(() => fetchLambda(text));
+  lambdaChain = run.catch(() => {});
+  try {
+    return await run;
+  } finally {
+    queueDepth--;
+  }
 }
 
 // ---------- Local fallback parser ----------
