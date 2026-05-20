@@ -4,3 +4,10 @@ memory/
 .DS_Store
 Thumbs.db
 *.log
+
+# Secrets — never commit
+.env
+.env.*
+.secrets/
+
+.vercel
