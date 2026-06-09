@@ -6,11 +6,24 @@
 (function() {
   const GITHUB_REPO = 'https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main';
 
-  // 1. Inject Styles
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = `${GITHUB_REPO}/styles.css`;
-  document.head.appendChild(link);
+  // 1. Inject Metadata & Global Resources
+  const injectHead = (tag, attrs) => {
+    const el = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    document.head.appendChild(el);
+  };
+
+  // Fonts
+  injectHead('link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' });
+  injectHead('link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' });
+  injectHead('link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap' });
+
+  // Favicon
+  injectHead('link', { rel: 'icon', type: 'image/svg+xml', href: `${GITHUB_REPO}/favicon.svg` });
+  injectHead('link', { rel: 'apple-touch-icon', href: `${GITHUB_REPO}/favicon.svg` });
+
+  // Main Styles
+  injectHead('link', { rel: 'stylesheet', href: `${GITHUB_REPO}/styles.css` });
 
   // 2. Inject Body Content
   const bodyHTML = `

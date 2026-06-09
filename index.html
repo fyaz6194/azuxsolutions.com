@@ -25,14 +25,6 @@
 <meta name="twitter:description" content="Chatbot-DateTime, GSTIN verification APIs, SGI Guidewire automation, GUI POS — future-proof accounting tooling from AZUX Solutions." />
 
 <link rel="canonical" href="https://azuxsolutions.com/" />
-<link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/favicon.svg" />
-<link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/favicon.svg" />
-
-<!-- Preconnect -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <!-- Structured data: Organization -->
 <script type="application/ld+json">
@@ -101,16 +93,47 @@
   "description": "Deterministic rule-based Python service that turns messy human-written datetimes into strict ISO 8601 UTC strings, wrapped in a JSON envelope with numeric status codes. REST API + CLI. India-first defaults."
 }
 </script>
+
+<style>
+  #loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #4f46e5;
+    background: #ffffff;
+  }
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    font-weight: 500;
+    font-size: 1.1rem;
+  }
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #4f46e5;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
 </head>
 <body>
-  <div id="loading" style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: 'Inter', sans-serif; color: #4f46e5;">
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; font-weight: 500; font-size: 1.1rem;">
-      <div style="width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #4f46e5; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+  <div id="loading">
+    <div class="loading-container">
+      <div class="spinner"></div>
       <span>Loading Chatbot-DateTime...</span>
     </div>
   </div>
-  <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
-  <!-- Loader -->
+
+  <!-- Main dynamic loader (The only external call) -->
   <script src="https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/index.js"></script>
 </body>
 </html>
