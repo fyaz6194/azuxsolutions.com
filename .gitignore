@@ -1,5 +1,8 @@
 memory/
 .claude/
+GEMINI.md
+AGENTS.md
+CLAUDE.md
 .vscode/
 .DS_Store
 Thumbs.db

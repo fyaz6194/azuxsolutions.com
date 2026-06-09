@@ -1,0 +1,860 @@
+/**
+ * AZUX Solutions — Chatbot-DateTime Dynamic Loader
+ * This script injects the site content and loads dependencies.
+ */
+
+(function() {
+  const GITHUB_REPO = 'https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main';
+
+  // 1. Inject Styles
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = `${GITHUB_REPO}/styles.css`;
+  document.head.appendChild(link);
+
+  // 2. Inject Body Content
+  const bodyHTML = `
+<!-- Announcement bar -->
+<a class="announce-bar" href="#demo">
+  <span class="announce-pulse"></span>
+  <span class="announce-text">
+    <strong>Stop fighting date pickers.</strong>
+    Type a date the way you'd say it — live demo right here
+  </span>
+  <span class="announce-cta">Try it ↓</span>
+</a>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="#top" class="brand">
+      <span class="brand-mark">{ }</span>
+      <span class="brand-name">Chatbot-DateTime</span>
+      <span class="brand-version">v1.0.0</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#demo">Demo</a>
+      <a href="#docs">Docs</a>
+      <a href="#codes">Status Codes</a>
+      <a href="#license">License</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a class="nav-cta" href="https://github.com/fyaz6194/Chatbot-DateTime" target="_blank" rel="noopener">GitHub ↗</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow">By AZUX Solutions</span>
+        <h1>Natural language in. <span class="accent">Strict ISO 8601 UTC</span> out.</h1>
+        <p class="lede">
+          A deterministic, rule-based Python service that turns messy human
+          datetimes like <code>"16 Apr 2026 10 PM"</code> or
+          <code>"30 min from now"</code> into a single canonical
+          <code>YYYY-MM-DDTHH:MM:SS.sssZ</code> string — wrapped in a JSON
+          envelope with machine-readable status codes.
+        </p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#demo">Try the demo</a>
+          <a class="btn btn-ghost" href="https://github.com/fyaz6194/Chatbot-DateTime" target="_blank" rel="noopener">View source ↗</a>
+        </div>
+        <ul class="hero-chips">
+          <li>Python 3.11</li>
+          <li>FastAPI</li>
+          <li>Offline-friendly</li>
+          <li>50 passing tests</li>
+        </ul>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-tryit">
+          <div class="hero-tryit-head">
+            <span class="hero-tryit-badge">
+              <span class="hero-tryit-pulse"></span>
+              LIVE &mdash; type and see
+            </span>
+            <span class="hero-tryit-title">Try it here</span>
+          </div>
+
+          <label class="hero-tryit-label" for="hero-input">Type any date or time in plain English</label>
+          <div class="hero-tryit-row">
+            <input id="hero-input" type="text" value="tomorrow at 9 PM" spellcheck="false" autocomplete="off" />
+            <button id="hero-go" class="btn btn-primary hero-tryit-btn">Parse →</button>
+          </div>
+
+          <div class="hero-tryit-chips">
+            <button class="hero-chip" data-value="30 min from now">30 min from now</button>
+            <button class="hero-chip" data-value="tomorrow at noon">tomorrow at noon</button>
+            <button class="hero-chip" data-value="25/04/26 6:00 AM">25/04/26 6:00 AM</button>
+            <button class="hero-chip" data-value="16 Apr 2026 10 PM">16 Apr 2026 10 PM</button>
+          </div>
+
+          <div class="hero-tryit-result">
+            <div class="hero-tryit-result-head">
+              <span class="col-label">Canonical output</span>
+              <span id="hero-status" class="status-badge"></span>
+            </div>
+            <div id="hero-datetime" class="hero-tryit-datetime">—</div>
+            <div id="hero-detail" class="hero-tryit-detail">Press Parse, click a chip, or just keep typing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PITCH -->
+  <section class="pitch">
+    <div class="container">
+      <p class="pitch-text">
+        Chatbot-DateTime is a small, dependency-light Python service for teams who
+        need to accept messy human datetime input and feed a
+        <strong>single canonical ISO 8601 UTC string</strong> to downstream systems.
+        It runs offline, respects India-first defaults (<code>Asia/Kolkata</code>, DMY),
+        enforces a <code>[now, now + 3 days]</code> validity window, and returns
+        numeric status codes so consuming applications can branch programmatically.
+        Both a CLI and a FastAPI REST interface ship in the box.
+      </p>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="section">
+    <div class="container">
+      <h2 class="section-title">What it does</h2>
+      <p class="section-sub">Nine reasons it sits quietly between your users and your database.</p>
+
+      <div class="feature-grid">
+        <article class="feature">
+          <div class="feature-icon">◎</div>
+          <h3>Strict output contract</h3>
+          <p>Every datetime returned as <code>YYYY-MM-DDTHH:MM:SS.sssZ</code> — ISO 8601 UTC with 3-digit milliseconds, enforced by a final regex check (<code>^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$</code>) so no response ever leaves the service in a looser format.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-icon">#</div>
+          <h3>Numeric status codes</h3>
+          <p>Every metadata field is a <code>{code, label}</code> pair. <strong>19 codes</strong> total across 4 tables (<code>ASSUMPTION</code>, <code>TREATED_AS</code>, <code>VALID_WINDOW</code>, <code>ERROR</code>) live in <code>config.py</code> — branch on integers, not translated strings.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-icon">🇮🇳</div>
+          <h3>India-first defaults</h3>
+          <p>Timezone <code>Asia/Kolkata</code> (UTC +05:30), date order <code>DMY</code>. Both are constants in <code>config.py</code> (<code>DEFAULT_TIMEZONE</code>, <code>DEFAULT_DATE_ORDER</code>) and overridable per request via <code>--tz</code> / <code>--date-order</code>.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-icon">⟂</div>
+          <h3>Validity window</h3>
+          <p>Default <code>[now, now + 3 days]</code> driven by <code>MAX_FUTURE_DAYS</code> in <code>config.py</code>. Past dates pass through flagged with <code>treated_as: past</code>; anything beyond the window is rejected with error code <code>11 — out_of_range_future</code>.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-icon">1</div>
+          <h3>One datetime per request</h3>
+          <p>A dedicated <code>_count_datetimes()</code> pass uses <code>dateparser.search_dates</code> to detect ranges or multiple timestamps and raises <code>MultipleDatetimesFound</code> → error code <code>10 — multiple_datetimes</code>. The contract stays strict by design.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-icon">⇄</div>
+          <h3>Two interfaces</h3>
+          <p>REST API (<code>POST /parse</code>, <code>GET /health</code>) via FastAPI with auto-generated OpenAPI docs, plus a CLI with <code>--tz</code>, <code>--date-order</code>, and <code>--serve</code> flags. Both share the same parser core.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-icon">✓</div>
+          <h3>Strict JSON-schema validation</h3>
+          <p>Four Draft 2020-12 schemas — <code>INPUT</code>, <code>OUTPUT_SUCCESS</code>, <code>OUTPUT_ERROR</code>, <code>LLM_RESPONSE</code> — in <code>validation/schemas.py</code> validate every payload at the boundary. Breakage is caught before it reaches a consumer.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-icon">◇</div>
+          <h3>Optional LLM fallback <span class="badge-dev">Under development</span></h3>
+          <p>Pluggable auth via env vars <code>DTB_LLM_URL</code>, <code>DTB_LLM_API_TOKEN</code>, <code>DTB_LLM_USERNAME</code>, <code>DTB_LLM_PASSWORD</code>. Provider-neutral (default template targets <code>claude-opus-4-6</code>) with a strict response schema and safety checks around the returned datetime.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-icon">⎈</div>
+          <h3>Offline-friendly</h3>
+          <p>Runs on modest hardware — roughly <strong>5&nbsp;GB RAM</strong> and a <strong>4-core CPU</strong> (Intel or ARM, &lt;&nbsp;1.5&nbsp;GHz is enough) for a <strong>single user in regular use</strong>. No internet required<sup>*</sup>.</p>
+          <p class="feature-note">Tested on an <strong>ARM cloud VM</strong> (arm64); runs equivalently on low-end Intel/AMD machines. <sup>*</sup> Except when the optional LLM fallback is enabled.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIENCE -->
+  <section class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Who it's for</h2>
+      <p class="section-sub">
+        The Python ecosystem already has several natural-language date tools —
+        <a href="https://dateparser.readthedocs.io/" target="_blank" rel="noopener">dateparser</a> (200+ locales, general-purpose),
+        <a href="https://github.com/bear/parsedatetime" target="_blank" rel="noopener">parsedatetime</a> (future relative dates),
+        <a href="https://github.com/alvinwan/timefhuman" target="_blank" rel="noopener">timefhuman</a> (ranges &amp; lists),
+        <a href="https://github.com/kvh/recurrent" target="_blank" rel="noopener">recurrent</a> (RRULE generation), and
+        <a href="https://dateutil.readthedocs.io/" target="_blank" rel="noopener">dateutil</a> (formatted dates).
+        Chatbot-DateTime is deliberately narrower: <strong>one datetime in, one strict ISO 8601 UTC string out</strong>,
+        wired for production pipelines where the contract matters more than feature breadth.
+      </p>
+
+      <div class="audience-grid">
+        <div class="audience-card">
+          <h4>Back-end developers</h4>
+          <p>
+            Drop-in service for normalizing user-submitted datetimes before they hit your database.
+            Where <code>dateparser</code> alone returns a Python <code>datetime</code> you still have to
+            format, this returns the canonical ISO-8601 UTC string already validated against a published
+            JSON schema — safe to store, index, or forward as-is.
+          </p>
+        </div>
+        <div class="audience-card">
+          <h4>GST &amp; compliance teams</h4>
+          <p>
+            Originally built to track
+            <a href="https://www.taxscan.in/top-stories/gst-portal-to-remain-unavailable-tomorrow-for-system-upgrade-check-timings-1431572" target="_blank" rel="noopener">GST portal scheduled-downtime windows</a>
+            (typically 2–6 hour rolling maintenance slots announced with short notice). The same
+            <code>[now, now + 3 days]</code> pattern fits any short-window schedule: filing deadlines,
+            e-invoice IRN windows, bank cut-off times, exchange notice boards.
+          </p>
+        </div>
+        <div class="audience-card">
+          <h4>Bot &amp; chatbot builders</h4>
+          <p>
+            Handles typos and sloppy formats that standard parsers reject outright — apostrophe years
+            (<code>25/Apr/'26</code>), two-digit years, space-separated tokens, DMY/MDY ambiguity. If
+            the rule-based pass still can't decide, the optional LLM fallback steps in with a
+            schema-validated response. No hand-crafted regex tables per locale.
+          </p>
+        </div>
+        <div class="audience-card">
+          <h4>Integration engineers</h4>
+          <p>
+            REST (<code>POST /parse</code>, <code>GET /health</code>) + OpenAPI 3.1 spec + <strong>19 numeric
+            status codes</strong> across 4 tables → trivial to wire into an existing pipeline. Branch on
+            integers, not translated strings; surface assumptions (<code>timezone_india_default</code>,
+            <code>date_order_dmy</code>) back to the user explicitly.
+          </p>
+        </div>
+        <div class="audience-card">
+          <h4>Data &amp; ETL engineers</h4>
+          <p>
+            Turn free-text columns in a CSV / spreadsheet / ticket export into clean ISO-8601 UTC
+            values in a single pass. The strict output regex makes downstream parquet / BigQuery /
+            Postgres loads predictable — no mixed timezones, no mystery millisecond precision.
+          </p>
+        </div>
+        <div class="audience-card">
+          <h4>FinTech &amp; scheduling apps</h4>
+          <p>
+            Slot-booking, appointment reminders, SIP / EMI due-date collectors — anywhere a user types
+            <em>"next Tuesday at 10"</em> and you need a canonical timestamp your billing / notification
+            engine can act on. India-first defaults (<code>Asia/Kolkata</code>, DMY) mean fewer
+            config-per-tenant workarounds for the common case.
+          </p>
+        </div>
+      </div>
+
+      <p class="ref-note">
+        References &amp; related tools:
+        <a href="https://dateparser.readthedocs.io/" target="_blank" rel="noopener">dateparser docs</a> ·
+        <a href="https://github.com/scrapinghub/dateparser" target="_blank" rel="noopener">dateparser (GitHub)</a> ·
+        <a href="https://github.com/bear/parsedatetime" target="_blank" rel="noopener">parsedatetime</a> ·
+        <a href="https://github.com/alvinwan/timefhuman" target="_blank" rel="noopener">timefhuman</a> ·
+        <a href="https://github.com/kvh/recurrent" target="_blank" rel="noopener">recurrent</a> ·
+        <a href="https://dateutil.readthedocs.io/" target="_blank" rel="noopener">python-dateutil</a> ·
+        <a href="https://developer.gst.gov.in/apiportal/" target="_blank" rel="noopener">GST Developer Portal</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section id="demo" class="section">
+    <div class="container">
+      <h2 class="section-title">Try it</h2>
+      <p class="section-sub">Calls the <strong>live hosted API</strong>. Falls back to an in-browser parser if the API is unreachable.</p>
+
+      <div class="demo-card">
+        <div class="demo-input">
+          <label for="demo-text">Input phrase</label>
+          <div class="demo-row">
+            <input id="demo-text" type="text" value="16 Apr 2026 10:00 PM" spellcheck="false" />
+            <button id="demo-go" class="btn btn-primary">Parse →</button>
+          </div>
+          <div class="demo-chips">
+            <button class="chip" data-value="16 Apr 2026 10:00 PM">16 Apr 2026 10:00 PM</button>
+            <button class="chip" data-value="25/04/26 6:00 AM">25/04/26 6:00 AM</button>
+            <button class="chip" data-value="30 min from now">30 min from now</button>
+            <button class="chip" data-value="tomorrow at noon">tomorrow at noon</button>
+            <button class="chip" data-value="24 Dec 2026 6:30 PM">24 Dec 2026 6:30 PM (far-future)</button>
+            <button class="chip" data-value="yesterday 9am">yesterday 9am</button>
+          </div>
+        </div>
+
+        <div class="demo-output">
+          <div class="demo-output-header">
+            <p class="col-label">JSON response</p>
+            <div class="badges">
+              <span id="demo-status" class="status-badge"></span>
+              <span id="demo-source" class="source-badge"></span>
+            </div>
+          </div>
+          <div class="code-window">
+            <div class="code-window-chrome">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="code-window-title">response.json</span>
+            </div>
+            <pre id="demo-result" class="lang-json"><code>// Press "Parse" to see output</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOCS: QUICK START -->
+  <section id="docs" class="section section-alt">
+    <div class="container docs-grid">
+      <div>
+        <h2 class="section-title">Quick start</h2>
+        <p class="section-sub">Clone, install, parse. Under a minute on a warm laptop.</p>
+<pre class="codeblock"><code><span class="c"># Clone</span>
+git clone https://github.com/fyaz6194/Chatbot-DateTime.git
+cd Chatbot-DateTime
+
+<span class="c"># Virtual env + deps</span>
+python -m venv .venv
+source .venv/Scripts/activate        <span class="c"># Windows git-bash</span>
+<span class="c"># or:  .\\.venv\\Scripts\\Activate.ps1  # PowerShell</span>
+<span class="c"># or:  source .venv/bin/activate     # macOS/Linux</span>
+pip install -r datetime_bot/requirements.txt
+
+<span class="c"># Parse once from the CLI</span>
+python -m datetime_bot <span class="s">"16 Apr 2026 10:00 PM"</span>
+
+<span class="c"># Or run the REST API</span>
+python -m datetime_bot --serve
+<span class="c"># -> http://127.0.0.1:8000/docs   (Swagger UI, local only)</span></code></pre>
+        <p class="docs-note">
+          The Swagger UI at <code>/docs</code> is served by FastAPI at runtime — it only
+          exists while the server is running locally. The underlying OpenAPI spec is
+          committed to the repo at
+          <a href="https://github.com/fyaz6194/Chatbot-DateTime/blob/main/datetime_bot/openapi.json" target="_blank" rel="noopener"><code>datetime_bot/openapi.json</code>&nbsp;↗</a>
+          and can be loaded into any OpenAPI viewer (e.g.
+          <a href="https://editor.swagger.io/" target="_blank" rel="noopener">editor.swagger.io</a>)
+          to get the same interactive docs without running the server.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="section-title">Example request</h2>
+        <p class="section-sub">Hit the REST interface, get a strict envelope back.</p>
+<pre class="codeblock"><code><span class="c"># Request</span>
+curl -X POST http://127.0.0.1:8000/parse \\
+  -H <span class="s">"Content-Type: application/json"</span> \\
+  -d <span class="s">'{"text": "16 Apr 2026 10:00 PM"}'</span></code></pre>
+
+<pre class="codeblock"><code><span class="c">// Response (200)</span>
+{
+  <span class="k">"datetime"</span>: <span class="s">"2026-04-16T16:30:00.000Z"</span>,
+  <span class="k">"assumption"</span>: [
+    {<span class="k">"code"</span>: 1, <span class="k">"label"</span>: <span class="s">"default_timezone_india"</span>},
+    {<span class="k">"code"</span>: 2, <span class="k">"label"</span>: <span class="s">"default_date_order_dmy"</span>}
+  ],
+  <span class="k">"treated_as"</span>:   {<span class="k">"code"</span>: 2, <span class="k">"label"</span>: <span class="s">"within_window"</span>},
+  <span class="k">"valid_window"</span>: {
+    <span class="k">"code"</span>: 1, <span class="k">"label"</span>: <span class="s">"in_window"</span>,
+    <span class="k">"start"</span>: <span class="s">"2026-04-15T22:52:27.521Z"</span>,
+    <span class="k">"end"</span>:   <span class="s">"2026-04-18T22:52:27.521Z"</span>
+  }
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATUS CODES -->
+  <section id="codes" class="section">
+    <div class="container">
+      <h2 class="section-title">Status-code reference</h2>
+      <p class="section-sub">Every metadata field carries a stable numeric code. Branch on these, not on labels.</p>
+
+      <div class="codes-grid">
+        <div class="codes-card">
+          <h4>Assumption codes <span class="mono">assumption[].code</span></h4>
+          <ul>
+            <li><span class="code-num">0</span> none</li>
+            <li><span class="code-num">1</span> default_timezone_india</li>
+            <li><span class="code-num">2</span> default_date_order_dmy</li>
+            <li><span class="code-num">3</span> current_year_injected</li>
+            <li><span class="code-num">4</span> two_digit_year_expanded</li>
+            <li><span class="code-num">5</span> space_separated_normalized</li>
+            <li><span class="code-num">6</span> llm_fallback</li>
+          </ul>
+        </div>
+
+        <div class="codes-card">
+          <h4>Treated-as codes <span class="mono">treated_as.code</span></h4>
+          <ul>
+            <li><span class="code-num">1</span> past</li>
+            <li><span class="code-num">2</span> within_window</li>
+            <li><span class="code-num">3</span> far_future</li>
+          </ul>
+          <h4 style="margin-top:1.2rem">Valid-window codes <span class="mono">valid_window.code</span></h4>
+          <ul>
+            <li><span class="code-num">1</span> in_window</li>
+            <li><span class="code-num">2</span> past_allowed</li>
+            <li><span class="code-num">3</span> out_of_range_future</li>
+          </ul>
+        </div>
+
+        <div class="codes-card codes-error">
+          <h4>Error codes <span class="mono">error.code</span></h4>
+          <ul>
+            <li><span class="code-num err">10</span> multiple_datetimes</li>
+            <li><span class="code-num err">11</span> out_of_range_future</li>
+            <li><span class="code-num err">12</span> unparseable</li>
+            <li><span class="code-num err">13</span> ambiguous_date</li>
+            <li><span class="code-num err">14</span> llm_bad_response</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Tech stack</h2>
+      <div class="stack-grid">
+        <div class="stack-item"><strong>Language</strong><span>Python 3.9 – 3.14<br><small>tested on 3.11 &middot; deployed on 3.14 (Lambda)</small></span></div>
+        <div class="stack-item"><strong>Parsing</strong><span>dateparser &ge; 1.2<br><small>+ custom regex preprocessors</small></span></div>
+        <div class="stack-item"><strong>API</strong><span>FastAPI &ge; 0.110<br><small>Uvicorn[standard] &ge; 0.27</small></span></div>
+        <div class="stack-item"><strong>Validation</strong><span>jsonschema &ge; 4.21<br><small>Draft 2020-12</small></span></div>
+        <div class="stack-item"><strong>Models</strong><span><a href="https://pydantic.dev/" target="_blank" rel="noopener">Pydantic &ge; 2.0 ↗</a><br><small>v2.x series</small></span></div>
+        <div class="stack-item"><strong>Tests</strong><span>pytest &ge; 8.0<br><small>50 passing cases</small></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACKNOWLEDGMENTS -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Helping the project development</h2>
+      <p class="section-sub">
+        Chatbot-DateTime leans on a small group of excellent open-source tools.
+        Help us develop this project further — a <strong>win-win for every side</strong>:
+        users get a more reliable parser, contributors get credit and a hardened codebase,
+        and the upstream tools listed below get real-world feedback from another production user.
+      </p>
+
+      <div class="winwin-banner">
+        <div class="winwin-item">
+          <span class="winwin-icon">👤</span>
+          <strong>For users</strong>
+          <p>A stricter, better-tested contract you can depend on.</p>
+        </div>
+        <div class="winwin-item">
+          <span class="winwin-icon">🛠</span>
+          <strong>For contributors</strong>
+          <p>Credited PRs, a focused scope, and a clean baseline to build on.</p>
+        </div>
+        <div class="winwin-item">
+          <span class="winwin-icon">📦</span>
+          <strong>For upstream tools</strong>
+          <p>Bug reports, edge-case coverage, and integration feedback flowing back.</p>
+        </div>
+        <div class="winwin-item">
+          <span class="winwin-icon">🏢</span>
+          <strong>For AZUX Solutions</strong>
+          <p>A hardened reference project we can confidently stand behind.</p>
+        </div>
+      </div>
+
+      <div class="thanks-grid">
+        <a class="thanks-card" href="https://pydantic.dev/" target="_blank" rel="noopener">
+          <div class="thanks-logo">P</div>
+          <div class="thanks-meta">
+            <h4>Pydantic</h4>
+            <p>Typed data models and validation for the request/response envelopes.</p>
+            <span class="thanks-url">pydantic.dev ↗</span>
+          </div>
+        </a>
+        <a class="thanks-card" href="https://fastapi.tiangolo.com/" target="_blank" rel="noopener">
+          <div class="thanks-logo">F</div>
+          <div class="thanks-meta">
+            <h4>FastAPI</h4>
+            <p>The REST interface + OpenAPI docs shipped out of the box.</p>
+            <span class="thanks-url">fastapi.tiangolo.com ↗</span>
+          </div>
+        </a>
+        <a class="thanks-card" href="https://dateparser.readthedocs.io/" target="_blank" rel="noopener">
+          <div class="thanks-logo">D</div>
+          <div class="thanks-meta">
+            <h4>dateparser</h4>
+            <p>Natural-language datetime parsing used alongside custom regex preprocessors.</p>
+            <span class="thanks-url">dateparser.readthedocs.io ↗</span>
+          </div>
+        </a>
+        <a class="thanks-card" href="https://json-schema.org/" target="_blank" rel="noopener">
+          <div class="thanks-logo">{ }</div>
+          <div class="thanks-meta">
+            <h4>JSON Schema</h4>
+            <p>Draft 2020-12 schemas validate every input and output at the boundary.</p>
+            <span class="thanks-url">json-schema.org ↗</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="section">
+    <div class="container about-block">
+      <h2 class="section-title">About AZUX Solutions</h2>
+      <p class="section-sub">
+        AZUX Solutions builds <strong>future-proof, open-technology tooling</strong> for
+        business accounting and day-to-day operations — grounded in first-hand operator
+        experience running multi-branch retail, not just academic theory.
+      </p>
+
+      <div class="about-grid">
+        <div class="about-story">
+          <h3>Our story</h3>
+          <p>
+            AZUX Solutions started with a practical problem. The founder began as an
+            <strong>accountant with only light programming knowledge</strong>, running
+            the books for a family business with six branches. Off-the-shelf point-of-sale
+            software didn't fit the way the business actually worked — licenses capped
+            features, add-ons were expensive, and the vendor's roadmap was never the
+            business's roadmap.
+          </p>
+          <p>
+            So he built one. A working <strong>POS system serving all six branches</strong>,
+            learning in the open, shipping for real users every day — the kind of
+            feedback loop no classroom can simulate.
+          </p>
+          <p>
+            <strong>AZUX Solutions was founded in mid-2017</strong> out of that work.
+            The founder later relocated to <strong>Canada</strong>, completed a
+            <strong>Diploma of Computer Science</strong>, and is currently pursuing a
+            <strong>Bachelor of Applied Science in Computer Engineering</strong> —
+            deepening the engineering foundations needed to build the next generation
+            of business tooling from the ground up. The company continues to operate
+            with one foot in <strong>India</strong> (where the original six-branch
+            business runs) and one in <strong>Canada</strong> (where new engineering
+            work happens).
+          </p>
+
+          <h3 style="margin-top:1.6rem">Nine years of shipping</h3>
+          <p>
+            AZUX Solutions has spent the last nine years quietly building and
+            learning across the full stack of small-business operations software:
+          </p>
+          <ul class="track-record">
+            <li>
+              <strong>Next-generation GUI POS software</strong> — a full rewrite from
+              scratch of the original six-branch system, now with a modern GUI and a
+              cleaner data model. Currently in active development; early design and
+              build sessions are documented on the
+              <a href="https://www.youtube.com/channel/UCbm6MJs2JGirHFecFHHtKDQ" target="_blank" rel="noopener">AZUX Solutions YouTube channel ↗</a>.
+            </li>
+            <li>
+              <strong>GSTIN verification APIs (backend)</strong> — integrations for
+              validating Indian Goods &amp; Services Tax identification numbers in
+              real time, built for compliance-heavy workflows.
+            </li>
+            <li>
+              <strong>SGI Guidewire automation</strong> — tooling that reduces
+              data-entry time on the Guidewire insurance platform used by Saskatchewan
+              Government Insurance, replacing repetitive clicks with scripted flows.
+            </li>
+            <li>
+              <strong>Cloud services &amp; scripting</strong> — hands-on work with
+              major cloud providers (serverless functions, object storage, monitoring),
+              OS-level resource scripting (PowerShell, bash), and CI/CD for lightweight
+              deployments like the one powering this site.
+            </li>
+            <li>
+              <strong>Chatbot-DateTime (public)</strong> — the first AZUX project
+              opened to the world. Source-visible today, with a clear path toward a
+              fully permissive license as the contract hardens.
+            </li>
+          </ul>
+
+          <h3 style="margin-top:1.6rem">Looking ahead</h3>
+          <p>
+            The long-term mission of AZUX Solutions is to
+            <strong>contribute meaningfully to the accounting world through
+            computation</strong> — shipping <strong>advanced accounting software</strong>
+            that treats the books as a first-class computational workload, not a
+            spreadsheet afterthought.
+          </p>
+          <p>
+            Concretely, that means marrying the operator know-how of running a real
+            multi-branch business with the engineering rigour of formal computer
+            science: deterministic rule-based cores (like Chatbot-DateTime), open
+            public schemas, machine-readable status codes, and the automation layer
+            that lets small and mid-sized businesses keep pace with the largest
+            enterprises — without paying enterprise-tier licensing.
+          </p>
+        </div>
+
+        <aside class="about-mission">
+          <h3>What we're building toward</h3>
+          <ul>
+            <li>
+              <strong>Future-proof accounting technology</strong> for small and
+              mid-sized businesses — not locked into any single vendor's roadmap.
+            </li>
+            <li>
+              <strong>Open-source-inspired</strong> building blocks: strict contracts,
+              public schemas, numeric status codes, no black boxes between you and
+              your data.
+            </li>
+            <li>
+              <strong>No artificial software limits</strong> — no per-branch license
+              caps, no "pro tier" gates on features a business genuinely needs.
+            </li>
+            <li>
+              <strong>Operator-first design</strong> — every default is chosen by
+              someone who has actually closed month-end on the receiving side.
+            </li>
+          </ul>
+          <p class="about-meta">
+            <strong>Founded:</strong> Mid-2017 &nbsp;·&nbsp;
+            <strong>Based in:</strong> India &amp; Canada &nbsp;·&nbsp;
+            <strong>Serving:</strong> India-first, globally applicable &nbsp;·&nbsp;
+            <strong>First public project:</strong> Chatbot-DateTime (v1.0.0)
+          </p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section section-alt">
+    <div class="container contact-block">
+      <h2 class="section-title">Contact &amp; contribute</h2>
+      <p class="section-sub">
+        Everything happens on GitHub. No email, no forms — the repo is the single source of
+        truth for questions, bug reports, and contributions.
+      </p>
+
+      <div class="contact-grid">
+        <a class="contact-card" href="https://github.com/fyaz6194/Chatbot-DateTime/issues/new/choose" target="_blank" rel="noopener">
+          <div class="contact-icon">!</div>
+          <div class="contact-meta">
+            <h4>Report a bug / ask a question</h4>
+            <p>Open an issue on the repo. Include the input that tripped the parser and the full JSON response if you can.</p>
+            <span class="contact-url">github.com/fyaz6194/Chatbot-DateTime/issues ↗</span>
+          </div>
+        </a>
+
+        <a class="contact-card" href="https://github.com/fyaz6194/Chatbot-DateTime/pulls" target="_blank" rel="noopener">
+          <div class="contact-icon">⇪</div>
+          <div class="contact-meta">
+            <h4>Send a pull request</h4>
+            <p>Contributions welcome under the source-visible license. Tests required for parser changes; see <code>datetime_bot/tests/</code>.</p>
+            <span class="contact-url">github.com/fyaz6194/Chatbot-DateTime/pulls ↗</span>
+          </div>
+        </a>
+
+        <a class="contact-card" href="https://github.com/fyaz6194/Chatbot-DateTime/discussions" target="_blank" rel="noopener">
+          <div class="contact-icon">💬</div>
+          <div class="contact-meta">
+            <h4>General discussion</h4>
+            <p>Ideas, use-case questions, integration help. If the repo doesn't have Discussions enabled yet, open an issue with the <code>question</code> label instead.</p>
+            <span class="contact-url">github.com/fyaz6194/Chatbot-DateTime/discussions ↗</span>
+          </div>
+        </a>
+
+        <a class="contact-card" href="https://github.com/fyaz6194" target="_blank" rel="noopener">
+          <div class="contact-icon">@</div>
+          <div class="contact-meta">
+            <h4>Maintainer</h4>
+            <p><strong>@fyaz6194</strong> — AZUX Solutions. Mention me in an issue or PR thread; I get notified on GitHub first.</p>
+            <span class="contact-url">github.com/fyaz6194 ↗</span>
+          </div>
+        </a>
+
+        <a class="contact-card" href="https://www.linkedin.com/in/fyaz/" target="_blank" rel="noopener">
+          <div class="contact-icon">in</div>
+          <div class="contact-meta">
+            <h4>LinkedIn</h4>
+            <p>Connect with the maintainer on LinkedIn for company-level or partnership conversations.</p>
+            <span class="contact-url">linkedin.com/in/fyaz ↗</span>
+          </div>
+        </a>
+
+        <a class="contact-card" href="https://www.youtube.com/channel/UCbm6MJs2JGirHFecFHHtKDQ" target="_blank" rel="noopener">
+          <div class="contact-icon">▶</div>
+          <div class="contact-meta">
+            <h4>YouTube</h4>
+            <p>Design sessions, build logs, and walkthroughs of early AZUX work — including the next-gen GUI POS software.</p>
+            <span class="contact-url">youtube.com/channel/UCbm6MJs2JGirHFecFHHtKDQ ↗</span>
+          </div>
+        </a>
+      </div>
+
+      <p class="muted-note" style="margin-top:1.4rem">
+        Prefer issues over DMs — public threads stay searchable and help the next person who hits the same question.
+      </p>
+    </div>
+  </section>
+
+  <!-- LICENSE -->
+  <section id="license" class="section">
+    <div class="container license-block">
+      <h2 class="section-title">License</h2>
+      <blockquote class="license-note">
+        <strong>Chatbot-DateTime</strong> is source-visible but <strong>not open-source</strong>.
+        You may <strong>read the code</strong> and <strong>submit pull requests</strong> to
+        improve it, but you may <strong>not</strong> use it in your own projects, products,
+        or services. See <code>LICENSE</code> in the repository for the full terms.
+      </blockquote>
+
+      <div class="why-restricted">
+        <h3>Why the restriction? (And why it will loosen)</h3>
+        <p>
+          This is a well-worn path in infrastructure software. Projects like
+          <a href="https://www.sqlite.org/copyright.html" target="_blank" rel="noopener"><strong>SQLite</strong></a>
+          (started restrictive, now public domain),
+          <a href="https://redis.io/blog/redis-adopts-dual-source-available-licensing/" target="_blank" rel="noopener"><strong>Redis</strong></a>,
+          <a href="https://www.mongodb.com/legal/licensing/server-side-public-license" target="_blank" rel="noopener"><strong>MongoDB</strong></a>, and
+          <a href="https://www.elastic.co/blog/why-license-change-aws" target="_blank" rel="noopener"><strong>Elasticsearch</strong></a>
+          (relicensed to guard against unfair cloud re-hosting), and modern
+          <a href="https://mariadb.com/bsl11/" target="_blank" rel="noopener"><strong>BSL</strong></a>-style
+          licenses used by
+          <a href="https://www.hashicorp.com/blog/hashicorp-adopts-business-source-license" target="_blank" rel="noopener"><strong>HashiCorp</strong></a>,
+          <a href="https://www.cockroachlabs.com/blog/oss-relicensing-cockroachdb/" target="_blank" rel="noopener"><strong>CockroachDB</strong></a>, and
+          <a href="https://fsl.software/" target="_blank" rel="noopener"><strong>Sentry</strong></a>
+          (source-visible today, auto-open after a set time) all followed the same
+          pattern: <em>be visible and contributable from day one, but keep reuse
+          restricted until the project is ready to carry the weight of production users.</em>
+        </p>
+        <p class="ref-note">
+          References:
+          <a href="https://www.sqlite.org/copyright.html" target="_blank" rel="noopener">SQLite copyright</a> ·
+          <a href="https://redis.io/blog/redis-adopts-dual-source-available-licensing/" target="_blank" rel="noopener">Redis relicense announcement</a> ·
+          <a href="https://www.mongodb.com/legal/licensing/server-side-public-license" target="_blank" rel="noopener">MongoDB SSPL</a> ·
+          <a href="https://www.elastic.co/blog/why-license-change-aws" target="_blank" rel="noopener">Elastic license change</a> ·
+          <a href="https://mariadb.com/bsl11/" target="_blank" rel="noopener">BSL 1.1 (MariaDB)</a> ·
+          <a href="https://www.hashicorp.com/blog/hashicorp-adopts-business-source-license" target="_blank" rel="noopener">HashiCorp &rarr; BSL</a> ·
+          <a href="https://www.cockroachlabs.com/blog/oss-relicensing-cockroachdb/" target="_blank" rel="noopener">CockroachDB relicense</a> ·
+          <a href="https://fsl.software/" target="_blank" rel="noopener">Functional Source License (Sentry)</a>
+        </p>
+        <p>Chatbot-DateTime is at that same early stage. Before unrestricted reuse can
+          be responsibly permitted, four layers of validation and feature work still need
+          to be closed out:
+        </p>
+
+        <ul class="why-list">
+          <li>
+            <strong>Broader test coverage.</strong> The 50 passing cases exercise format
+            parsing and range classification. End-to-end coverage across edge cases,
+            locales, long-running API sessions, and regression suites is still in progress.
+          </li>
+          <li>
+            <strong>Cybersecurity hardening.</strong> Input fuzzing, JSON-schema boundary
+            abuse, auth-header handling for the LLM fallback, rate-limit behavior, and a
+            dependency / supply-chain review all need formal sign-off before the service
+            is safe to embed in third-party products.
+          </li>
+          <li>
+            <strong>Hardware &amp; performance testing.</strong> The stated spec
+            (5&nbsp;GB RAM, 4-core ARM @ 2.0&nbsp;GHz, single user) is validated for
+            regular use. Benchmarks across x86/ARM, higher concurrency, low-memory
+            devices, and sustained-load profiles still need to be run and published.
+          </li>
+          <li>
+            <strong>Feature work on the baseline.</strong> The current scope is
+            deliberately minimal. Planned additions — richer locale support, configurable
+            validity windows, observability hooks, hardened LLM fallback, and a reference
+            client SDK — must land before the output contract is declared stable.
+          </li>
+        </ul>
+
+        <div class="journey">
+          <div class="journey-step done">
+            <span class="journey-dot"></span>
+            <div>
+              <strong>Today <span class="journey-date" id="journey-today">(loading…)</span> — Source-visible, no external use</strong>
+              <p>Read, learn, and contribute via pull requests. No production reuse.</p>
+            </div>
+          </div>
+          <div class="journey-step active">
+            <span class="journey-dot"></span>
+            <div>
+              <strong>Next — Hardening phase</strong>
+              <p>Test coverage, cybersecurity review, performance benchmarks, baseline features.</p>
+            </div>
+          </div>
+          <div class="journey-step">
+            <span class="journey-dot"></span>
+            <div>
+              <strong>Then — Relaxed license</strong>
+              <p>Once hardened, the license moves toward a permissive open-source tier (BSL-style time-release or outright MIT/Apache on the stable surface).</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="muted-note">
+          Until the items above are complete, the source-visible / no-external-use
+          license protects downstream users from depending on behavior that is still
+          subject to change — and protects the project from being forked into
+          unmaintainable derivatives before its contract is stable.
+        </p>
+      </div>
+      <div class="license-links">
+        <a class="btn btn-ghost" href="https://github.com/fyaz6194/Chatbot-DateTime" target="_blank" rel="noopener">Source ↗</a>
+        <a class="btn btn-ghost" href="https://github.com/fyaz6194/Chatbot-DateTime/releases/tag/v1.0.0" target="_blank" rel="noopener">Release v1.0.0 ↗</a>
+        <a class="btn btn-ghost" href="https://github.com/fyaz6194/Chatbot-DateTime/blob/main/LICENSE" target="_blank" rel="noopener">Full license ↗</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="brand">
+        <span class="brand-mark">{ }</span>
+        <span class="brand-name">Chatbot-DateTime</span>
+      </div>
+      <p class="muted">AZUX Solutions — future-proof, open-technology tooling for business accounting.<br>Founded 2017 · Based in India &amp; Canada · Serving India-first, globally applicable.</p>
+    </div>
+    <div class="footer-links">
+      <a href="#features">Features</a>
+      <a href="#demo">Demo</a>
+      <a href="#docs">Docs</a>
+      <a href="#codes">Status Codes</a>
+      <a href="#contact">Contact</a>
+      <a href="https://github.com/fyaz6194/Chatbot-DateTime" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://github.com/fyaz6194" target="_blank" rel="noopener" aria-label="GitHub">GitHub</a>
+      <a href="https://www.linkedin.com/in/fyaz/" target="_blank" rel="noopener" aria-label="LinkedIn">LinkedIn</a>
+      <a href="https://www.youtube.com/channel/UCbm6MJs2JGirHFecFHHtKDQ" target="_blank" rel="noopener" aria-label="YouTube">YouTube</a>
+    </div>
+    <div class="muted small">
+      © <span id="year"></span> AZUX Solutions. Source-visible, no-use license.
+    </div>
+  </div>
+</footer>
+`;
+
+  document.body.innerHTML = bodyHTML;
+
+  // 3. Load Main Script
+  const script = document.createElement('script');
+  script.src = `${GITHUB_REPO}/script.js`;
+  document.body.appendChild(script);
+
+  // 4. Load Vercel Scripts
+  const vercelInsights = document.createElement('script');
+  vercelInsights.defer = true;
+  vercelInsights.src = '/_vercel/insights/script.js';
+  document.body.appendChild(vercelInsights);
+
+  const vercelSpeed = document.createElement('script');
+  vercelSpeed.defer = true;
+  vercelSpeed.src = '/_vercel/speed-insights/script.js';
+  document.body.appendChild(vercelSpeed);
+})();
