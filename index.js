@@ -880,11 +880,22 @@ curl -X POST http://127.0.0.1:8000/parse \\
     document.body.appendChild(vercelSpeed);
   };
 
-  if (styleLink.sheet) {
-    reveal();                                  // already cached/parsed this navigation
-  } else {
-    styleLink.addEventListener('load', reveal);
-    styleLink.addEventListener('error', reveal); // CSS failed → still show content
-    setTimeout(reveal, 3000);                  // safety net if neither event fires
+  // Reveal only once styles.css is genuinely attached and applied. We can't rely
+  // on the link's "load" event alone: it intermittently fires a tick before the
+  // sheet is registered in the CSSOM, which paints the content unstyled (FOUC).
+  // So we verify the applied state — link.sheet is non-null (set when the sheet
+  // is loaded + parsed) or styles.css is present in document.styleSheets — and
+  // use the load event, a short poll, and a hard timeout merely as triggers.
+  const STYLES = '/styles.css';
+  const cssApplied = () => !!styleLink.sheet ||
+    [].some.call(document.styleSheets, s => (s.href || '').indexOf(STYLES) > -1);
+
+  const tryReveal = () => { if (cssApplied()) { reveal(); return true; } return false; };
+
+  if (!tryReveal()) {
+    const poll = setInterval(() => { if (reveal.done || tryReveal()) clearInterval(poll); }, 16);
+    styleLink.addEventListener('load', tryReveal);
+    styleLink.addEventListener('error', () => { clearInterval(poll); reveal(); }); // genuine failure → show anyway
+    setTimeout(() => { clearInterval(poll); reveal(); }, 3000); // hard cap so the spinner can never strand
   }
 })();
