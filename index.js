@@ -11,6 +11,7 @@
     const el = document.createElement(tag);
     Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
     document.head.appendChild(el);
+    return el;
   };
 
   // Fonts
@@ -22,8 +23,8 @@
   injectHead('link', { rel: 'icon', type: 'image/svg+xml', href: `${GITHUB_REPO}/favicon.svg` });
   injectHead('link', { rel: 'apple-touch-icon', href: `${GITHUB_REPO}/favicon.svg` });
 
-  // Main Styles
-  injectHead('link', { rel: 'stylesheet', href: `${GITHUB_REPO}/styles.css` });
+  // Main Styles — captured so we can hold the reveal until it's in memory (no FOUC)
+  const styleLink = injectHead('link', { rel: 'stylesheet', href: `${GITHUB_REPO}/styles.css` });
 
   // 2. Inject Body Content
   const bodyHTML = `
@@ -853,21 +854,37 @@ curl -X POST http://127.0.0.1:8000/parse \\
 </footer>
 `;
 
-  document.body.innerHTML = bodyHTML;
+  // 3. Reveal the page only once styles.css is parsed and in memory, so the
+  //    content never paints unstyled. Guarded so it runs exactly once, with
+  //    error + timeout fallbacks so a CSS failure can't strand the spinner.
+  const reveal = () => {
+    if (reveal.done) return;
+    reveal.done = true;
 
-  // 3. Load Main Script
-  const script = document.createElement('script');
-  script.src = `${GITHUB_REPO}/script.js`;
-  document.body.appendChild(script);
+    document.body.innerHTML = bodyHTML;
 
-  // 4. Load Vercel Scripts
-  const vercelInsights = document.createElement('script');
-  vercelInsights.defer = true;
-  vercelInsights.src = '/_vercel/insights/script.js';
-  document.body.appendChild(vercelInsights);
+    // Load Main Script
+    const script = document.createElement('script');
+    script.src = `${GITHUB_REPO}/script.js`;
+    document.body.appendChild(script);
 
-  const vercelSpeed = document.createElement('script');
-  vercelSpeed.defer = true;
-  vercelSpeed.src = '/_vercel/speed-insights/script.js';
-  document.body.appendChild(vercelSpeed);
+    // Load Vercel Scripts
+    const vercelInsights = document.createElement('script');
+    vercelInsights.defer = true;
+    vercelInsights.src = '/_vercel/insights/script.js';
+    document.body.appendChild(vercelInsights);
+
+    const vercelSpeed = document.createElement('script');
+    vercelSpeed.defer = true;
+    vercelSpeed.src = '/_vercel/speed-insights/script.js';
+    document.body.appendChild(vercelSpeed);
+  };
+
+  if (styleLink.sheet) {
+    reveal();                                  // already cached/parsed this navigation
+  } else {
+    styleLink.addEventListener('load', reveal);
+    styleLink.addEventListener('error', reveal); // CSS failed → still show content
+    setTimeout(reveal, 3000);                  // safety net if neither event fires
+  }
 })();
