@@ -8,6 +8,9 @@ CLAUDE.md
 Thumbs.db
 *.log
 
+# Local audit artifact — contains the raw API URL; never commit
+lighthouse-report.json
+
 # Secrets — never commit
 .env
 .env.*

@@ -22,8 +22,14 @@ if (toggle) {
   );
 }
 
-// ---------- Live Lambda API ----------
-const API_URL = 'https://REDACTED.lambda-url.ap-south-1.on.aws/parse';
+// ---------- Live API ----------
+// Endpoint is kept out of the source as a plain string to deter casual scraping,
+// source-grep, GitHub code search and URL harvesters. It is stored reversed-base64
+// in fragments and reassembled only when a request is made. NOTE: this is
+// obfuscation, not security — the URL is still visible in the browser DevTools
+// Network tab at request time. For true hiding, route through a server-side proxy.
+const _epParts = ['lNnchB3LzdXYu42bu', 'ETLoRXdvNXLwFmLsJXdtEGZi', '1WYs5CbxZGa0BDNlJWb3g3cyMTZvZmZl5GashGc0djM3ZXZz9yL6MHc0RHa'];
+const apiUrl = () => atob(_epParts.join('').split('').reverse().join(''));
 
 // Serial queue: at most one Lambda request in flight; additional callers
 // wait their turn. Queue depth capped at 5 — beyond that we reject so the
@@ -33,7 +39,7 @@ let queueDepth = 0;
 let lambdaChain = Promise.resolve();
 
 async function fetchLambda(text) {
-  const resp = await fetch(API_URL, {
+  const resp = await fetch(apiUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text }),
