@@ -6,6 +6,35 @@
 (function() {
   const GITHUB_REPO = 'https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main';
 
+  // 0. Silence "Ignoring unsupported entryTypes: longtask" console notices.
+  //    Vercel Speed Insights calls PerformanceObserver.observe() with entry types
+  //    (e.g. longtask) that some browsers (Firefox) don't support, and the engine
+  //    logs a notice. We can't edit the third-party script, so we patch observe()
+  //    to drop any entry types not in supportedEntryTypes BEFORE it runs. On
+  //    browsers that do support a type, nothing is stripped — metrics are unaffected.
+  (function () {
+    try {
+      var PO = window.PerformanceObserver;
+      if (!PO || !PO.prototype || !PO.supportedEntryTypes) return;
+      var supported = PO.supportedEntryTypes;
+      var orig = PO.prototype.observe;
+      PO.prototype.observe = function (opts) {
+        try {
+          if (opts && Array.isArray(opts.entryTypes)) {
+            var keep = opts.entryTypes.filter(function (t) { return supported.indexOf(t) > -1; });
+            if (!keep.length) return;                       // nothing supported → no-op
+            if (keep.length !== opts.entryTypes.length) {
+              var clone = {}; for (var k in opts) clone[k] = opts[k]; clone.entryTypes = keep; opts = clone;
+            }
+          } else if (opts && opts.type && supported.indexOf(opts.type) === -1) {
+            return;                                          // single unsupported type → no-op
+          }
+        } catch (e) { /* fall through to native */ }
+        return orig.call(this, opts);
+      };
+    } catch (e) { /* leave native observe in place */ }
+  })();
+
   // 1. Inject Metadata & Global Resources
   const injectHead = (tag, attrs) => {
     const el = document.createElement(tag);
