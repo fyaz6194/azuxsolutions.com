@@ -111,11 +111,14 @@
     font-family: system-ui, -apple-system, sans-serif;
     color: #4f46e5;
     background: #ffffff;
-    /* Delayed spinner: stay invisible for 250ms, then fade in. Fast loads
-       (hard reload ~70ms, quick first visits) reveal content before this
-       fires, so the spinner never flashes; only a genuinely slow load shows it. */
+    /* Delayed spinner (delay + minDuration pattern, per UX research). Stay
+       invisible for 500ms, then fade in. Fast loads (hard reload ~70ms, quick
+       first visits) reveal content before this fires, so the spinner never
+       flashes; only a genuinely slow load shows it. The 500ms here must match
+       SPINNER_DELAY in index.js, which also holds a shown spinner ~200ms to
+       prevent flicker. */
     opacity: 0;
-    animation: loading-appear 150ms ease-out 250ms forwards;
+    animation: loading-appear 150ms ease-out 500ms forwards;
   }
   @keyframes loading-appear {
     to { opacity: 1; }

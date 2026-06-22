@@ -880,6 +880,21 @@ curl -X POST http://127.0.0.1:8000/parse \\
     document.body.appendChild(vercelSpeed);
   };
 
+  // Spinner timing (delay + minDuration pattern, per UX guidance / spin-delay):
+  // the #loading spinner in index.html stays invisible until SPINNER_DELAY (CSS
+  // animation-delay must match), so fast loads never flash it. If content is ready
+  // before then, reveal immediately. If the spinner HAS faded in (slow load), hold
+  // it for at least SPINNER_MIN so it can't appear-then-vanish (flicker).
+  const SPINNER_DELAY = 500, SPINNER_MIN = 200;
+  const commit = () => {
+    if (reveal.done || commit.scheduled) return;
+    const now = performance.now();
+    if (now < SPINNER_DELAY) { reveal(); return; }   // spinner never showed → reveal now
+    commit.scheduled = true;
+    const wait = (SPINNER_DELAY + SPINNER_MIN) - now; // keep a visible spinner up briefly
+    if (wait > 0) setTimeout(reveal, wait); else reveal();
+  };
+
   // Reveal only once styles.css is genuinely attached and applied. We can't rely
   // on the link's "load" event alone: it intermittently fires a tick before the
   // sheet is registered in the CSSOM, which paints the content unstyled (FOUC).
@@ -890,7 +905,7 @@ curl -X POST http://127.0.0.1:8000/parse \\
   const cssApplied = () => !!styleLink.sheet ||
     [].some.call(document.styleSheets, s => (s.href || '').indexOf(STYLES) > -1);
 
-  const tryReveal = () => { if (cssApplied()) { reveal(); return true; } return false; };
+  const tryReveal = () => { if (cssApplied()) { commit(); return true; } return false; };
 
   if (!tryReveal()) {
     const poll = setInterval(() => { if (reveal.done || tryReveal()) clearInterval(poll); }, 16);
