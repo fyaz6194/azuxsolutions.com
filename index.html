@@ -111,6 +111,17 @@
     font-family: system-ui, -apple-system, sans-serif;
     color: #4f46e5;
     background: #ffffff;
+    /* Delayed spinner: stay invisible for 250ms, then fade in. Fast loads
+       (hard reload ~70ms, quick first visits) reveal content before this
+       fires, so the spinner never flashes; only a genuinely slow load shows it. */
+    opacity: 0;
+    animation: loading-appear 150ms ease-out 250ms forwards;
+  }
+  @keyframes loading-appear {
+    to { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #loading { animation-duration: 1ms; }
   }
   .loading-container {
     display: flex;
