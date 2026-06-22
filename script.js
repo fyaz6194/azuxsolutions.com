@@ -244,7 +244,7 @@ function renderOutput(status, source, dataObj) {
   sourceTag.className = 'source-badge ' + (source === 'live' ? 'live' : 'local');
 }
 
-async function run() {
+async function run(initial) {
   const value = input.value.trim();
   if (!value) {
     out.innerHTML = '<code><span class="c">// Enter a phrase and press "Parse"</span></code>';
@@ -253,11 +253,16 @@ async function run() {
     return;
   }
 
-  btn.disabled = true;
-  btn.textContent = 'Parsing…';
-  out.innerHTML = '<code><span class="c">// Calling live API…</span></code>';
-  statusTag.textContent = '';
-  sourceTag.textContent = '';
+  // On the automatic first render, skip the loading placeholder. Wiping the
+  // output to "Calling live API…" and back is what makes the demo visibly
+  // flash/refresh on a warm (cached) reload; the result still fills in below.
+  if (!initial) {
+    btn.disabled = true;
+    btn.textContent = 'Parsing…';
+    out.innerHTML = '<code><span class="c">// Calling live API…</span></code>';
+    statusTag.textContent = '';
+    sourceTag.textContent = '';
+  }
 
   try {
     const resp = await callLambda(value);
@@ -268,8 +273,10 @@ async function run() {
     renderOutput(_error ? 422 : 200, 'local', rest);
   }
 
-  btn.disabled = false;
-  btn.textContent = 'Parse →';
+  if (!initial) {
+    btn.disabled = false;
+    btn.textContent = 'Parse →';
+  }
 }
 
 btn.addEventListener('click', run);
@@ -278,7 +285,7 @@ document.querySelectorAll('.chip').forEach(c =>
   c.addEventListener('click', () => { input.value = c.dataset.value; run(); })
 );
 
-run();
+run(true); // first render — fill the pre-rendered output in place, no flash
 
 // ---------- Hero mini-demo ----------
 const heroInput    = document.getElementById('hero-input');
@@ -314,7 +321,7 @@ function renderHero(status, dataObj) {
   }
 }
 
-async function runHero() {
+async function runHero(initial) {
   const value = heroInput.value.trim();
   if (!value) {
     heroDt.textContent = '—';
@@ -322,9 +329,13 @@ async function runHero() {
     heroStatus.textContent = '';
     return;
   }
-  heroBtn.disabled = true;
-  heroBtn.textContent = '…';
-  heroDetail.textContent = 'Calling live API…';
+  // Same as run(): skip the loading reset on the automatic first render so the
+  // hero card doesn't flash through "Calling live API…" on a warm reload.
+  if (!initial) {
+    heroBtn.disabled = true;
+    heroBtn.textContent = '…';
+    heroDetail.textContent = 'Calling live API…';
+  }
 
   try {
     const resp = await callLambda(value);
@@ -335,8 +346,10 @@ async function runHero() {
     renderHero(_error ? 422 : 200, rest);
   }
 
-  heroBtn.disabled = false;
-  heroBtn.textContent = 'Parse →';
+  if (!initial) {
+    heroBtn.disabled = false;
+    heroBtn.textContent = 'Parse →';
+  }
 }
 
 if (heroBtn) {
@@ -345,5 +358,5 @@ if (heroBtn) {
   document.querySelectorAll('.hero-chip').forEach(c =>
     c.addEventListener('click', () => { heroInput.value = c.dataset.value; runHero(); })
   );
-  runHero(); // first render
+  runHero(true); // first render — fill in place, no flash
 }
