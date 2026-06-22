@@ -10,6 +10,10 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/styles.css" />
 <link rel="preload" as="script" href="https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/index.js" />
+<!-- Self-hosted fonts: preload so they're ready by first paint (crossorigin
+     required — font fetches are always CORS, and these are cross-origin on the CDN). -->
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/fonts/inter-latin-var.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/fonts/jetbrains-mono-latin-var.woff2" />
 
 <title>AZUX Solutions — Chatbot-DateTime &amp; Accounting Tools</title>
 <meta name="description" content="AZUX Solutions by Fyaz Manknojiya (India &amp; Canada, est. 2017): Chatbot-DateTime, GSTIN verification APIs, SGI Guidewire automation, and GUI POS software." />

@@ -14,10 +14,8 @@
     return el;
   };
 
-  // Fonts
-  injectHead('link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' });
-  injectHead('link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' });
-  injectHead('link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap' });
+  // Fonts are now self-hosted (see @font-face in styles.css) and preloaded in
+  // index.html — no Google Fonts request needed.
 
   // Favicon
   injectHead('link', { rel: 'icon', type: 'image/svg+xml', href: `${GITHUB_REPO}/favicon.svg` });
