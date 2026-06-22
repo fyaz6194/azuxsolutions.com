@@ -4,6 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+<!-- Favicon declared statically so the browser uses it instead of probing
+     /favicon.ico (which 404s). Served from Vercel; favicon.svg is at the repo root. -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/favicon.svg" />
+
 <!-- Resource hints: start fetching the CDN bundle + styles in parallel during
      head parse so a hard reload (Ctrl+Shift+R) spends less time on the spinner.
      Without these, styles.css is only requested after index.js downloads+runs. -->

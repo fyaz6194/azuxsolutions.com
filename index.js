@@ -17,9 +17,7 @@
   // Fonts are now self-hosted (see @font-face in styles.css) and preloaded in
   // index.html — no Google Fonts request needed.
 
-  // Favicon
-  injectHead('link', { rel: 'icon', type: 'image/svg+xml', href: `${GITHUB_REPO}/favicon.svg` });
-  injectHead('link', { rel: 'apple-touch-icon', href: `${GITHUB_REPO}/favicon.svg` });
+  // Favicon is declared statically in index.html (stops the /favicon.ico 404).
 
   // Main Styles — captured so we can hold the reveal until it's in memory (no FOUC)
   const styleLink = injectHead('link', { rel: 'stylesheet', href: `${GITHUB_REPO}/styles.css` });
