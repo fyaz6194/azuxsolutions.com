@@ -23,13 +23,11 @@ if (toggle) {
 }
 
 // ---------- Live API ----------
-// Endpoint is kept out of the source as a plain string to deter casual scraping,
-// source-grep, GitHub code search and URL harvesters. It is stored reversed-base64
-// in fragments and reassembled only when a request is made. NOTE: this is
-// obfuscation, not security — the URL is still visible in the browser DevTools
-// Network tab at request time. For true hiding, route through a server-side proxy.
-const _epParts = ['ZXNyYXAvZW1pdGV0YWQtdG9idG', 'FoYy9tb2Muc25vaXR1bG9zeHV6Y', 'S5uaS5haGN0cGFjLy86cHR0aA=='];
-const apiUrl = () => atob(_epParts.join('').split('').reverse().join(''));
+// Same-origin path proxied by Vercel (see "rewrites" in vercel.json) to the
+// real backend. The browser only ever talks HTTPS to azuxsolutions.com; Vercel
+// forwards server-side to the (HTTP) upstream, so there is no mixed-content
+// block and the backend host never appears in client code or DevTools.
+const API_URL = '/api/parse';
 
 // Serial queue: at most one Lambda request in flight; additional callers
 // wait their turn. Queue depth capped at 5 — beyond that we reject so the
@@ -39,7 +37,7 @@ let queueDepth = 0;
 let lambdaChain = Promise.resolve();
 
 async function fetchLambda(text) {
-  const resp = await fetch(apiUrl(), {
+  const resp = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text }),
