@@ -11,6 +11,9 @@ Thumbs.db
 # Local audit artifact — contains the raw API URL; never commit
 lighthouse-report.json
 
+# Private infrastructure notes (IPs, server details)
+INFRA.md
+
 # Secrets — never commit
 .env
 .env.*
