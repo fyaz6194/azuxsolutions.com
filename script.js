@@ -28,7 +28,7 @@ if (toggle) {
 // in fragments and reassembled only when a request is made. NOTE: this is
 // obfuscation, not security — the URL is still visible in the browser DevTools
 // Network tab at request time. For true hiding, route through a server-side proxy.
-const _epParts = ['lNnchB3LzdXYu42bu', 'ETLoRXdvNXLwFmLsJXdtEGZi', '1WYs5CbxZGa0BDNlJWb3g3cyMTZvZmZl5GashGc0djM3ZXZz9yL6MHc0RHa'];
+const _epParts = ['ZXNyYXAvZW1pdGV0YWQtdG9idG', 'FoYy9tb2Muc25vaXR1bG9zeHV6Y', 'S5uaS5haGN0cGFjLy86cHR0aA=='];
 const apiUrl = () => atob(_epParts.join('').split('').reverse().join(''));
 
 // Serial queue: at most one Lambda request in flight; additional callers
