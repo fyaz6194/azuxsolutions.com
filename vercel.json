@@ -15,6 +15,12 @@
       ]
     },
     {
+      "source": "/",
+      "headers": [
+        { "key": "Link", "value": "<https://cdn.jsdelivr.net>; rel=preconnect; crossorigin, <https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/styles.css>; rel=preload; as=style, <https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/index.js>; rel=preload; as=script, <https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/fonts/inter-latin-var.woff2>; rel=preload; as=font; type=font/woff2; crossorigin, <https://cdn.jsdelivr.net/gh/fyaz6194/azuxsolutions.com@main/fonts/jetbrains-mono-latin-var.woff2>; rel=preload; as=font; type=font/woff2; crossorigin" }
+      ]
+    },
+    {
       "source": "/(.*)\\.(css|js)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=300, s-maxage=86400, stale-while-revalidate=604800" }
