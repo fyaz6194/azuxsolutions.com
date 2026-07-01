@@ -29,12 +29,34 @@ if (toggle) {
 // block and the backend host never appears in client code or DevTools.
 const API_URL = '/api/parse';
 
-// Serial queue: at most one Lambda request in flight; additional callers
-// wait their turn. Queue depth capped at 5 — beyond that we reject so the
-// caller falls back to the local parser instead of piling up requests.
+// Concurrency-limited queue: at most MAX_CONCURRENT requests in flight at once
+// (so the hero + main demo can fire together on load instead of strictly
+// one-after-another), with any extra callers waiting for a free slot. Total
+// callers (in-flight + waiting) capped at MAX_QUEUE — beyond that we reject so
+// the caller falls back to the local parser instead of piling up requests.
+// The backend is a single small box (rate-limited a few req/s), so we keep the
+// concurrency low; 2 covers the two page-load calls without stampeding it.
+const MAX_CONCURRENT = 2;
 const MAX_QUEUE = 5;
-let queueDepth = 0;
-let lambdaChain = Promise.resolve();
+let queueDepth = 0;   // callers in the system: in-flight + waiting
+let active = 0;       // requests currently in flight (<= MAX_CONCURRENT)
+const waiters = [];   // resolvers for callers waiting for a free slot
+
+// Take one of the MAX_CONCURRENT slots, or wait in line until one frees up.
+function acquireSlot() {
+  if (active < MAX_CONCURRENT) {
+    active++;
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => waiters.push(resolve));
+}
+
+// Release a slot: hand it directly to the next waiter if any, else free it.
+function releaseSlot() {
+  const next = waiters.shift();
+  if (next) next();        // slot passed on; `active` stays the same
+  else active--;
+}
 
 async function fetchLambda(text) {
   const resp = await fetch(API_URL, {
@@ -51,10 +73,13 @@ async function callLambda(text) {
     throw new Error('queue_full');
   }
   queueDepth++;
-  const run = lambdaChain.then(() => fetchLambda(text));
-  lambdaChain = run.catch(() => {});
   try {
-    return await run;
+    await acquireSlot();
+    try {
+      return await fetchLambda(text);
+    } finally {
+      releaseSlot();
+    }
   } finally {
     queueDepth--;
   }
