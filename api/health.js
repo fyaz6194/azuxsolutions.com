@@ -39,10 +39,56 @@ function getUpstream(urlStr) {
   });
 }
 
+// Diagnostic: time each phase of a FRESH (non-pooled) connection so we can see
+// whether a cold stall is DNS, TCP connect, or the backend response itself.
+function timedProbe(urlStr) {
+  return new Promise((resolve) => {
+    const u = new URL(urlStr);
+    const isHttps = u.protocol === 'https:';
+    const lib = isHttps ? https : http;
+    const t = { start: performance.now() };
+    const request = lib.request(
+      u,
+      { method: 'GET', agent: false }, // agent:false => always a fresh socket
+      (upstream) => {
+        t.ttfb = performance.now();
+        upstream.on('data', () => {});
+        upstream.on('end', () => {
+          t.end = performance.now();
+          const ph = (a, b) => (a && b ? Number((a - b).toFixed(1)) : null);
+          resolve({
+            status: upstream.statusCode,
+            dns_ms: ph(t.dns, t.start),
+            connect_ms: ph(t.connect, t.dns || t.start),
+            tls_ms: ph(t.secure, t.connect),
+            ttfb_after_conn_ms: ph(t.ttfb, t.secure || t.connect),
+            total_ms: ph(t.end, t.start),
+          });
+        });
+      }
+    );
+    request.on('socket', (s) => {
+      s.on('lookup', () => { t.dns = performance.now(); });
+      s.on('connect', () => { t.connect = performance.now(); });
+      s.on('secureConnect', () => { t.secure = performance.now(); });
+    });
+    request.on('error', (e) => resolve({ _error: String(e.message), total_ms: Number((performance.now() - t.start).toFixed(1)) }));
+    request.setTimeout(UPSTREAM_TIMEOUT_MS, () => request.destroy(new Error('timeout')));
+    request.end();
+  });
+}
+
 module.exports = async (req, res) => {
   const url = process.env.PARSE_HEALTH;
   if (!url) {
     res.status(500).json({ _error: 'health_not_configured' });
+    return;
+  }
+
+  // ?debug=1 -> single fresh-connection probe with per-phase timing breakdown.
+  if (new URL(req.url, 'http://x').searchParams.get('debug') === '1') {
+    res.setHeader('Cache-Control', 'no-store');
+    res.status(200).json({ phase_timing: await timedProbe(url), region: process.env.VERCEL_REGION || null });
     return;
   }
 
