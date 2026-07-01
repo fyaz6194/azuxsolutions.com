@@ -7,6 +7,51 @@
 //
 // The backend URL lives ONLY in the Vercel env var PARSE_BACKEND (set via the
 // Vercel dashboard or `vercel env add PARSE_BACKEND`), never committed to git.
+//
+// Connection keep-alive: the backend is a small home-hosted box reached through
+// Cloudflare -> Oracle -> Pi. Establishing a *fresh* connection to it can stall
+// for several seconds, while a reused one responds in ~10ms. The module-scoped
+// keep-alive agents below hold TCP sockets open across invocations of a warm
+// instance, so requests stay on the fast path. Pair with an external keep-warm
+// ping to /api/parse (~1/min) so an instance stays alive to hold those sockets.
+const http = require('http');
+const https = require('https');
+
+const AGENT_OPTS = { keepAlive: true, keepAliveMsecs: 30000, maxSockets: 4 };
+const httpAgent = new http.Agent(AGENT_OPTS);
+const httpsAgent = new https.Agent(AGENT_OPTS);
+const UPSTREAM_TIMEOUT_MS = 9000;
+
+// POST a JSON payload to the backend over a pooled keep-alive socket.
+function postUpstream(urlStr, payload) {
+  return new Promise((resolve, reject) => {
+    const u = new URL(urlStr);
+    const isHttps = u.protocol === 'https:';
+    const lib = isHttps ? https : http;
+    const request = lib.request(
+      u,
+      {
+        method: 'POST',
+        agent: isHttps ? httpsAgent : httpAgent,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
+        },
+      },
+      (upstream) => {
+        let body = '';
+        upstream.setEncoding('utf8');
+        upstream.on('data', (chunk) => { body += chunk; });
+        upstream.on('end', () => resolve({ status: upstream.statusCode, body }));
+      }
+    );
+    request.on('error', reject);
+    request.setTimeout(UPSTREAM_TIMEOUT_MS, () => request.destroy(new Error('upstream_timeout')));
+    request.write(payload);
+    request.end();
+  });
+}
+
 module.exports = async (req, res) => {
   const backend = process.env.PARSE_BACKEND;
   if (!backend) {
@@ -35,15 +80,10 @@ module.exports = async (req, res) => {
     return;
   }
   try {
-    const upstream = await fetch(backend, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
-    });
-    const out = await upstream.text();
+    const upstream = await postUpstream(backend, JSON.stringify({ text }));
     res.status(upstream.status);
     res.setHeader('Content-Type', 'application/json');
-    res.send(out);
+    res.send(upstream.body);
   } catch (e) {
     res.status(502).json({ _error: 'upstream_unreachable' });
   }
