@@ -130,7 +130,7 @@
           <div class="hero-tryit-chips">
             <button class="hero-chip" data-value="30 min from now">30 min from now</button>
             <button class="hero-chip" data-value="tomorrow at noon">tomorrow at noon</button>
-            <button class="hero-chip" data-value="25/04/26 6:00 AM">25/04/26 6:00 AM</button>
+            <button class="hero-chip" data-value="25/04/2026 6:00 AM">25/04/2026 6:00 AM</button>
             <button class="hero-chip" data-value="16 Apr 2026 10 PM">16 Apr 2026 10 PM</button>
           </div>
 
@@ -314,12 +314,12 @@
         <div class="demo-input">
           <label for="demo-text">Input phrase</label>
           <div class="demo-row">
-            <input id="demo-text" type="text" value="25/04/26 6:00 AM" spellcheck="false" />
+            <input id="demo-text" type="text" value="25/04/2026 6:00 AM" spellcheck="false" />
             <button id="demo-go" class="btn btn-primary">Parse →</button>
           </div>
           <div class="demo-chips">
             <button class="chip" data-value="16 Apr 2026 10:00 PM">16 Apr 2026 10:00 PM</button>
-            <button class="chip" data-value="25/04/26 6:00 AM">25/04/26 6:00 AM</button>
+            <button class="chip" data-value="25/04/2026 6:00 AM">25/04/2026 6:00 AM</button>
             <button class="chip" data-value="30 min from now">30 min from now</button>
             <button class="chip" data-value="tomorrow at noon">tomorrow at noon</button>
             <button class="chip" data-value="24 Dec 2026 6:30 PM">24 Dec 2026 6:30 PM (far-future)</button>

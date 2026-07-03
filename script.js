@@ -85,22 +85,6 @@ async function callLambda(text) {
   }
 }
 
-// Pick up a request that index.html's <head> already fired for this exact phrase
-// (the two page-load defaults), so the first render awaits an in-flight fetch
-// instead of starting a fresh one ~850ms later. Consumed once: any later manual
-// re-parse of the same text goes through callLambda for a fresh result. Returns
-// a promise ({status, data}) or null when there's no prefetch to reuse; a
-// rejected prefetch (network error) propagates so the caller's catch → local
-// fallback path runs exactly as it would for a failed callLambda.
-function takePrefetch(text) {
-  const store = window.__parsePrefetch;
-  if (!store) return null;
-  const p = store[text];
-  if (!p) return null;
-  delete store[text];   // one-shot: only the initial page-load render uses it
-  return p;
-}
-
 // ---------- Local fallback parser ----------
 // Used when the Lambda call fails (CORS, network, etc.)
 
@@ -310,8 +294,7 @@ async function run(initial) {
   }
 
   try {
-    const pre = initial ? takePrefetch(value) : null;
-    const resp = pre ? await pre : await callLambda(value);
+    const resp = await callLambda(value);
     renderOutput(resp.status, 'live', resp.data);
   } catch (err) {
     const result = parsePhrase(value);
@@ -384,8 +367,7 @@ async function runHero(initial) {
   }
 
   try {
-    const pre = initial ? takePrefetch(value) : null;
-    const resp = pre ? await pre : await callLambda(value);
+    const resp = await callLambda(value);
     renderHero(resp.status, resp.data);
   } catch (err) {
     const result = parsePhrase(value);

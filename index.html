@@ -4,33 +4,58 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- Prefetch the two page-load /api/parse calls (hero + main demo) as early as
-     possible. These requests don't depend on the DOM — they only need the two
-     DEFAULT input phrases, which are hardcoded in index.js's body template. By
-     firing them here (during <head> parse, reusing the document's already-open
-     same-origin connection) instead of waiting for the three-stage loader to
-     run script.js (~1.3s in), the demo cards get their live result ~850ms
-     sooner. script.js consumes these promises instead of calling the API again,
-     so the total stays 2 requests (respecting the MAX_CONCURRENT=2 limiter).
+<!-- Early API warm-up + de-duplication. Served fresh by Vercel, so this logic
+     is live immediately, independent of the CDN-lagged index.js/script.js.
 
-     COUPLING: the two phrases below MUST match the `value=""` defaults of
-     #hero-input and #demo-text in index.js. If a default changes there and not
-     here, the prefetch is simply wasted — script.js falls back to a fresh live
-     call, so behaviour stays correct, just without the head start. -->
+     (1) Warm-up: fire the two page-load /api/parse calls (hero + main demo
+         defaults) during <head> parse — ~850ms before the three-stage loader
+         runs script.js — over the document's already-open same-origin
+         connection, so the demo cards fill in sooner.
+
+     (2) De-dupe: wrap fetch() with a short-TTL cache keyed on the POST body.
+         When script.js later fetches /api/parse for the same default phrase it
+         reuses this already-in-flight / just-finished response instead of
+         hitting the backend a second time. Because the wrapper lives here (not
+         in the bundle), the backend is called at most once per input no matter
+         which cached mix of index.js/script.js the browser is running — this is
+         what prevents the double-call, not a version-coupled handshake.
+
+     The warm-up phrases should match the `value=""` defaults of #hero-input and
+     #demo-text in index.js. If they drift the only cost is a missed head-start
+     (an extra call) — never a wrong result. -->
 <script>
   (function () {
     try {
-      window.__parsePrefetch = {};
-      ['tomorrow at 9 PM', '25/04/26 6:00 AM'].forEach(function (text) {
-        window.__parsePrefetch[text] = fetch('/api/parse', {
+      var TTL_MS = 10000;
+      var pending = Object.create(null);              // POST body -> Promise<Response>
+      var nativeFetch = window.fetch.bind(window);
+      window.fetch = function (input, init) {
+        try {
+          var url = typeof input === 'string' ? input : (input && input.url);
+          if (url && url.indexOf('/api/parse') !== -1 &&
+              init && init.method === 'POST' && typeof init.body === 'string') {
+            var key = init.body, hit = pending[key];
+            if (hit) return hit.then(function (r) { return r.clone(); });
+            var p = nativeFetch(input, init);
+            pending[key] = p;
+            p.then(
+              function () { setTimeout(function () { if (pending[key] === p) delete pending[key]; }, TTL_MS); },
+              function () { if (pending[key] === p) delete pending[key]; }
+            );
+            return p.then(function (r) { return r.clone(); });
+          }
+        } catch (e) { /* fall through to a normal fetch */ }
+        return nativeFetch(input, init);
+      };
+
+      ['tomorrow at 9 PM', '25/04/2026 6:00 AM'].forEach(function (text) {
+        window.fetch('/api/parse', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: text })
-        }).then(function (r) {
-          return r.json().then(function (data) { return { status: r.status, data: data }; });
-        });
+        }).catch(function () {});
       });
-    } catch (e) { /* prefetch is best-effort; script.js falls back to the live call */ }
+    } catch (e) { /* warm-up is best-effort */ }
   })();
 </script>
 
