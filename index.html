@@ -4,6 +4,36 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+<!-- Prefetch the two page-load /api/parse calls (hero + main demo) as early as
+     possible. These requests don't depend on the DOM — they only need the two
+     DEFAULT input phrases, which are hardcoded in index.js's body template. By
+     firing them here (during <head> parse, reusing the document's already-open
+     same-origin connection) instead of waiting for the three-stage loader to
+     run script.js (~1.3s in), the demo cards get their live result ~850ms
+     sooner. script.js consumes these promises instead of calling the API again,
+     so the total stays 2 requests (respecting the MAX_CONCURRENT=2 limiter).
+
+     COUPLING: the two phrases below MUST match the `value=""` defaults of
+     #hero-input and #demo-text in index.js. If a default changes there and not
+     here, the prefetch is simply wasted — script.js falls back to a fresh live
+     call, so behaviour stays correct, just without the head start. -->
+<script>
+  (function () {
+    try {
+      window.__parsePrefetch = {};
+      ['tomorrow at 9 PM', '25/04/26 6:00 AM'].forEach(function (text) {
+        window.__parsePrefetch[text] = fetch('/api/parse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text })
+        }).then(function (r) {
+          return r.json().then(function (data) { return { status: r.status, data: data }; });
+        });
+      });
+    } catch (e) { /* prefetch is best-effort; script.js falls back to the live call */ }
+  })();
+</script>
+
 <!-- Favicon declared statically so the browser uses it instead of probing
      /favicon.ico (which 404s). Served from Vercel; favicon.svg is at the repo root. -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

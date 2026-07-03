@@ -314,7 +314,7 @@
         <div class="demo-input">
           <label for="demo-text">Input phrase</label>
           <div class="demo-row">
-            <input id="demo-text" type="text" value="16 Apr 2026 10:00 PM" spellcheck="false" />
+            <input id="demo-text" type="text" value="25/04/26 6:00 AM" spellcheck="false" />
             <button id="demo-go" class="btn btn-primary">Parse →</button>
           </div>
           <div class="demo-chips">
